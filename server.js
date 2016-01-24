@@ -24,8 +24,6 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
       socket.on('disconnect', function () {
         sockets.splice(sockets.indexOf(socket), 1);
       });
-  
-      socket.emit("greeting", "Hello!");
   });
 });
 
