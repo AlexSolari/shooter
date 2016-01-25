@@ -1,9 +1,6 @@
 /*global io*/
-function Connection(name) {
-    this.username = name || "Anon";
-    
+function Connection() {
     this.socket = io.connect(document.location.href);
-    this.Send("login", this.username);
 }
 
 Connection.prototype.Send = function (type, data) {

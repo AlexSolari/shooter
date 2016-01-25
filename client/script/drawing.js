@@ -74,4 +74,8 @@ Drawer.prototype.Image = function(url, x, y, angle) {
     });
     
 	
-}
+};
+
+Drawer.prototype.Clear = function() {
+    this.Canvas.clearRect(0, 0, window.innerWidth, window.innerHeight);
+};
