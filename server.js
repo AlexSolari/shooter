@@ -22,16 +22,18 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
   io.on('connection', function (socket) {
       
     var client = game.AddClient(socket);
-        
+    console.log("connected: " +client.id);
+    
     client.AddRequestHandler('disconnect', function () {
-        game.RemoveClient(client.id);
+      console.log("disconnected: " +client.id);
+      game.RemoveClient(client.id);
     });
      
     client.AddRequestHandler("getInput_response", function(data) {
-        client.input = data;
-        
-        client.ProcessInput();
-      });
+      client.input = data;
+      
+      client.ProcessInput();
+    });
       
   });
   

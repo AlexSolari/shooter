@@ -4,7 +4,6 @@
 var drawer;
 var connection;
 var input = { clicked: false, x: 0, y: 0 };
-var isActive = true;
 var fpsDom = null;
 var pingDom = null;
 var getInputRequest = "getInput_request";
@@ -33,16 +32,16 @@ window.onload = function() {
     pingDom.innerHTML = (new Date().getTime() - date) + "ms";
     fpsDom.innerHTML = (1000/frameTime).toFixed(0) + "fps";
     
-    if (isActive)
-    {
-      drawer.Clear();
-      coords.forEach(function (coord) {
-          if (coord.type != "common-ship")
-            drawer.Circle(coord.x, coord.y, 2);
-          else
-            drawer.Image("sprite.png", coord.x, coord.y, coord.angle+90);
-      });
-    }
+    drawer.Clear();
+    coords.forEach(function (coord) {
+        if (coord.type != "common-ship")
+          drawer.Circle(coord.x, coord.y, 2);
+        else
+        {
+          drawer.Image("sprite.png", coord.x, coord.y, coord.angle+90);
+          drawer.Text(coord.hp + "/1000", coord.x-30, coord.y - 20, 10);
+        }
+    });
   });
 };
 
@@ -54,7 +53,3 @@ window.onmousemove = function (event) {
 window.onmousedown = function () { input.clicked = true; };
 
 window.onmouseup = function () { input.clicked = false; };
-
-window.onfocus = function() { this.isActive = true; };
-
-window.onblur = function() { this.isActive = false; };
