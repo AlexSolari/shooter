@@ -4,3 +4,13 @@ body{
     width: 100%;
     height: 100%;
 }
+#ping, #fps{
+    position: fixed;
+    -webkit-user-select: none; /* Chrome/Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+ */
+    cursor: default;
+}
+#fps{
+    top: 1em;
+}
