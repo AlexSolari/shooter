@@ -60,6 +60,20 @@ Drawer.prototype.Circle = function(x, y, radius, color) {
     this.Canvas.closePath();
 };
 
+Drawer.prototype.Curve = function(points, color) {
+    color = color || this.Defaults.Color;
+    
+    this.Canvas.beginPath();
+    this.Canvas.strokeStyle = color;
+    this.Canvas.beginPath();
+    this.Canvas.moveTo( points[0].x, points[0].y);
+    for (var i = 1; i < points.length; i++) {
+        this.Canvas.lineTo( points[i].x, points[i].y);
+    }
+    this.Canvas.stroke();
+    this.Canvas.closePath();
+};
+
 Drawer.prototype.Image = function(url, x, y, angle) { 
     angle = angle || this.Defaults.Angle;
     
