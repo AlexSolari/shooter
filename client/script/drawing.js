@@ -1,9 +1,9 @@
-function ImagePool()
+function ImageCache()
 {
     this.data = [];    
 }
 
-ImagePool.prototype.Get = function (url, callback) {
+ImageCache.prototype.Get = function (url, callback) {
     var result = this.data[url];
     
     if (!result)
@@ -24,7 +24,7 @@ ImagePool.prototype.Get = function (url, callback) {
 };
 
 function Drawer() {
-    this.Pool = new ImagePool();
+    this.Pool = new ImageCache();
     var domCanvas = document.getElementById("canvas");
     domCanvas.width = window.innerWidth;
     domCanvas.height = window.innerHeight;
