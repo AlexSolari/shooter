@@ -5,15 +5,26 @@
     <title>title</title>
     <link rel="stylesheet" href="styles/style.css">
     <script src="socket.io/socket.io.js"></script>
+    <script src="script/explosion.js"></script>
     <script src="script/drawing.js"></script>
     <script src="script/connection.js"></script>
     <script src="script/script.js"></script>
   </head>
   <body>
+      <div id="popup">
+        <div class="container">
+          <h1>Enter your name:</h1>
+          <input type="text" id="name" maxlength="10"/><br>
+          <button id="start">Start!</button>
+        </div>
+      </div>
       <div id="ping"></div>
       <div id="fps"></div>
-      <canvas id="canvas">
+      <div class="canvas-wrapper">
+        <canvas id="canvas">
           
-      </canvas>
+        </canvas>
+      </div>
+      
   </body>
 </html>

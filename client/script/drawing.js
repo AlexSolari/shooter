@@ -1,6 +1,6 @@
 function ImageCache()
 {
-    this.data = [];    
+    this.data = {};    
 }
 
 ImageCache.prototype.Get = function (url, callback) {
@@ -13,21 +13,46 @@ ImageCache.prototype.Get = function (url, callback) {
         
         result.onload = function () {
             self.data[url] = result;
-            callback(result);
+            
+            if (callback)
+                callback(result);
         };
         result.src = url;
         
         return;
     }
     
-    callback(result);
+    if (callback)
+        callback(result);
+};
+
+ImageCache.prototype.Assets = ["sprites/mines/common-mine-projectile.png",
+                                "sprites/rockets/common-rocket-projectile.png",
+                                "sprites/ships/common-ship/sprite-self.png", 
+                                "sprites/ships/common-ship/sprite.png",
+                                "sprites/explosion/1.png",
+                                "sprites/explosion/2.png",
+                                "sprites/explosion/3.png",
+                                "sprites/explosion/4.png",
+                                "sprites/explosion/5.png",
+                                "sprites/projectiles/common-projectile.png",];
+                                
+ImageCache.prototype.Initialize = function () {
+    console.log("Loading assets @ " + new Date().getTime());
+    var self = this;
+    this.Assets.forEach(function (asset) {
+        self.Get(asset);
+    });
+    console.log("Assets loaded @ " + new Date().getTime());        
 };
 
 function Drawer() {
-    this.Pool = new ImageCache();
+    this.Cache = new ImageCache();
+    this.Cache.Initialize();
     var domCanvas = document.getElementById("canvas");
-    domCanvas.width = window.innerWidth;
-    domCanvas.height = window.innerHeight;
+    this.delta = window.innerWidth/1920;
+    domCanvas.width = 1920;
+    domCanvas.height = 1080;
     this.Canvas = domCanvas.getContext("2d");
 }
 
@@ -79,7 +104,7 @@ Drawer.prototype.Image = function(url, x, y, angle) {
     
     var self = this;
     
-    this.Pool.Get(url, function (image) {
+    this.Cache.Get(url, function (image) {
         self.Canvas.save(); 
 	    self.Canvas.translate(x, y);
 	    self.Canvas.rotate(angle * Math.PI/180);
@@ -91,5 +116,5 @@ Drawer.prototype.Image = function(url, x, y, angle) {
 };
 
 Drawer.prototype.Clear = function() {
-    this.Canvas.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    this.Canvas.clearRect(0, 0, 1920, 1080);
 };

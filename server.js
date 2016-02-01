@@ -32,14 +32,29 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
     client.AddRequestHandler("getInput_response", function(data) {
       client.input = data;
       
-      client.ProcessInput();
+      client.Update();
+    });
+    
+    client.AddRequestHandler('start', function() {
+       client.Start(); 
+    });
+    
+    client.AddRequestHandler("login", function(name) {
+      name = name.slice(0, 10).replace(/^\s+|\s+$/gm,'');
+      if (name.length == 0)
+        name = "Anon";
+      client.ship.name = name;
     });
       
   });
   
   game.StartMainLoop(UpdatesPerSecond, function () {
     game.Broadcast("getInput_request");
-    game.Broadcast("gamestate", { coords: game.GetState(), date: new Date().getTime() } );
+    
+    var sTime = new Date().getTime();
+    var state = game.GetState();
+    
+    game.Broadcast("gamestate", { coords: state, date: new Date().getTime() - sTime } );
   });
   
 });
