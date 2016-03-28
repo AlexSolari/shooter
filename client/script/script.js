@@ -17,6 +17,7 @@ var explosions = [];
 
 function Draw() {
   var entities = frameToDraw || [];
+  entities = entities.filter(function (entity) { return (entity.x != 0 && entity.y != 0) });
   
   drawer.Clear();
   var ships = entities.filter(function (entity) { return entity.type.indexOf("-ship") > 0});
@@ -74,7 +75,6 @@ function Draw() {
     }
     drawer.Image("sprites/explosion/"+explosion.stage+".png", explosion.x, explosion.y);
   });
-  
 }
 
 function ProcessResponse(entities) {
