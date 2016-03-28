@@ -4,8 +4,8 @@ function Connection() {
 }
 
 Connection.prototype.Start = function (name) {
+    this.Send("start", document.getElementById("ship-type").value);
     this.Send("login", name);
-    this.Send("start");
 };
 
 Connection.prototype.Send = function (type, data) {

@@ -43,14 +43,20 @@ canvas{
     margin-left: -350px;
     padding: 2em;
 }
-#name{
+#name, #ship-type{
     margin-bottom: 1em;
     text-align: center;
     padding: .3em;
     font-size: 2em;
     border-radius: 10px;
 }
-#start{
+#start, #spectrate{
+    margin: .1em;
     padding: 1em;
     font-size: 2em;
+}
+#last-kill{
+    color: rgba(249, 255, 0, 0.64);
+    position: fixed;
+    bottom: 0;
 }

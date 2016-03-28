@@ -4,18 +4,20 @@
     <meta charset="utf-8">
     <title>title</title>
     <link rel="stylesheet" href="styles/style.css">
-    <script src="socket.io/socket.io.js"></script>
-    <script src="script/explosion.js"></script>
-    <script src="script/drawing.js"></script>
-    <script src="script/connection.js"></script>
-    <script src="script/script.js"></script>
   </head>
   <body>
+      <div id="last-kill"></div>
       <div id="popup">
         <div class="container">
           <h1>Enter your name:</h1>
           <input type="text" id="name" maxlength="10"/><br>
-          <button id="start">Start!</button>
+          <select id="ship-type">
+            <option value="interceptor-ship">Interceptor</option>
+            <option value="common-ship">Fighter</option>
+            <option value="frigate-ship">Frigate</option>
+            <option value="destroyer-ship">Destroyer</option>
+          </select><br>
+          <button id="start">Start!</button><button id="spectrate">Spectrate</button>
         </div>
       </div>
       <div id="ping"></div>
@@ -25,6 +27,10 @@
           
         </canvas>
       </div>
-      
+    <script src="socket.io/socket.io.js" async></script>
+    <script src="script/explosion.js" async></script>
+    <script src="script/drawing.js" async></script>
+    <script src="script/connection.js" async></script>
+    <script src="script/script.js" async></script>
   </body>
 </html>

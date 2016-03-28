@@ -1,6 +1,7 @@
 function ImageCache()
 {
     this.data = {};    
+    this.Initialize();
 }
 
 ImageCache.prototype.Get = function (url, callback) {
@@ -17,6 +18,15 @@ ImageCache.prototype.Get = function (url, callback) {
             if (callback)
                 callback(result);
         };
+        
+        result.onerror = function () {
+            self.data[url] = self.data["sprites/missingTexture.png"];
+            console.log("Error while loading sprite " + url);
+            
+            if (callback)
+                callback(self.data["sprites/missingTexture.png"]);
+        };
+        
         result.src = url;
         
         return;
@@ -26,29 +36,41 @@ ImageCache.prototype.Get = function (url, callback) {
         callback(result);
 };
 
-ImageCache.prototype.Assets = ["sprites/mines/common-mine-projectile.png",
+ImageCache.prototype.Assets = [
+                                "sprites/mines/common-mine-projectile.png",
                                 "sprites/rockets/common-rocket-projectile.png",
+                                "sprites/rockets/disabled-small-rocket-projectile.png",
+                                "sprites/rockets/guided-small-rocket-projectile.png",
+                                "sprites/rockets/small-rocket-projectile.png",
                                 "sprites/ships/common-ship/sprite-self.png", 
                                 "sprites/ships/common-ship/sprite.png",
+                                "sprites/ships/destroyer-ship/sprite-self.png", 
+                                "sprites/ships/destroyer-ship/sprite.png",
+                                "sprites/ships/frigate-ship/sprite-self.png", 
+                                "sprites/ships/frigate-ship/sprite.png",
+                                "sprites/ships/interceptor-ship/sprite-self.png", 
+                                "sprites/ships/interceptor-ship/sprite.png",
                                 "sprites/explosion/1.png",
                                 "sprites/explosion/2.png",
                                 "sprites/explosion/3.png",
                                 "sprites/explosion/4.png",
                                 "sprites/explosion/5.png",
-                                "sprites/projectiles/common-projectile.png",];
+                                "sprites/projectiles/common-projectile.png",
+                                "sprites/projectiles/plasma-projectile.png",
+                                "sprites/projectiles/singularity-projectile.png",
+                                "sprites/missingTexture.png"
+                              ];
                                 
 ImageCache.prototype.Initialize = function () {
     console.log("Loading assets @ " + new Date().getTime());
-    var self = this;
-    this.Assets.forEach(function (asset) {
-        self.Get(asset);
-    });
+    for (var i = this.Assets.length - 1; i >= 0; i--) {
+        this.Get(this.Assets[i]);
+    }
     console.log("Assets loaded @ " + new Date().getTime());        
 };
 
 function Drawer() {
     this.Cache = new ImageCache();
-    this.Cache.Initialize();
     var domCanvas = document.getElementById("canvas");
     this.delta = window.innerWidth/1920;
     domCanvas.width = 1920;
