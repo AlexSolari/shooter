@@ -31,8 +31,6 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
      
     client.AddRequestHandler("getInput_response", function(data) {
       client.input = data;
-      
-      client.Update();
     });
     
     client.AddRequestHandler('start', function(data) {
@@ -48,18 +46,19 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
   });
   
   game.StartMainLoop(UpdatesPerSecond, function () {
+    var sTime = new Date().getTime();
+    
     game.clients.forEach(function (client) {
       client.Update();
     });
     
     game.Broadcast("getInput_request");
 
-    var sTime = new Date().getTime();
     var state = game.GetState();
     
     game.Broadcast("gamestate", { coords: state, date: new Date().getTime() - sTime } );
   });
   
-  game.AddBots(7);
+  game.AddBots(15);
 });
 
