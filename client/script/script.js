@@ -24,6 +24,7 @@ function Draw() {
   var ships = entities.filter(function (entity) { return entity.type.indexOf("-ship") > 0});
   var projectiles = entities.filter(function (entity) { return entity.type.indexOf("-ship") < 0});
   ships.forEach(function(entity) {
+
       if (entity.state == "dead" && entity.respawnTimer > 98)
         {
           explosions.push(new Explosion(entity.x, entity.y));
@@ -105,6 +106,7 @@ window.onload = function() {
     var name = document.getElementById('name').value;
     var type = document.getElementById('ship-type').value;
     var hint = "<li> <strong>{key}</strong> - {desc} </li>";
+    var shipHint = document.getElementById("hint-ship");
     var hints = document.getElementById("hints-list");
     connection.Start(name);
     document.getElementById('popup').style.display = "none";
@@ -112,25 +114,30 @@ window.onload = function() {
       case 'interceptor-ship':
         hints.innerHTML += hint.replace("{key}", "Q").replace("{desc}", "Place mine that explodes on touch, dealing 10 dmg.");
         hints.innerHTML += hint.replace("{key}", "W").replace("{desc}", "Overdrive reactor, increasing move and firing speed.");
+        shipHint.innerHTML = "Fast ship, 60 HP. <br/> Projectile damage: 0.5 <br/>  Projectile speed: 20";
         break;
       case 'common-ship':
         hints.innerHTML += hint.replace("{key}", "Q").replace("{desc}", "Launch homing missle, that deals 10 dmg. Only 2 rockets can exist at on time.");
         hints.innerHTML += hint.replace("{key}", "W").replace("{desc}", "Place mine that explodes on touch, dealing 10 dmg.");
+        shipHint.innerHTML = "Medium speed ship, 100 HP. <br/> Projectile damage: 1.5 <br/>  Projectile speed: 15";
         break;
       case 'frigate-ship':
         hints.innerHTML += hint.replace("{key}", "Q").replace("{desc}", "Activate shield, lowering all incoming damage to 1.");
         hints.innerHTML += hint.replace("{key}", "W").replace("{desc}", "Charge your attacks, increasing projectile speed and lowering activation time.");
+        shipHint.innerHTML = "Slow ship, 170 HP. <br/> Projectile damage: 25 <br/>  Projectile speed: 10 <br/> Homing projectiles";
         break;
       case 'destroyer-ship':
         hints.innerHTML += hint.replace("{key}", "Q").replace("{desc}", "Repair your ship for 25hp.");
         hints.innerHTML += hint.replace("{key}", "W").replace("{desc}", "Warp, increasing speed and acceleration.");
         hints.innerHTML += hint.replace("{key}", "Passive").replace("{desc}", "Repairs your ship slowly.");
+        shipHint.innerHTML = "Very slow ship, 250 HP. <br/> Projectile damage: 0.5 <br/>  Projectile speed: 5 <br/> AOE over time damage projectiles";
         break;
     }
     
   };
   btn2.onclick = function () {
     document.getElementById('popup').style.display = "none";
+    document.getElementById('hints').style.display = "none";
   };
   
   fpsDom = document.getElementById('fps');

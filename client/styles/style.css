@@ -70,11 +70,13 @@ canvas{
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE10+ */
     
+    background-color: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255, 0.5);
+    
     max-width: 250px;
 }
 #leaderboard{
     color: #C4F6FF;
-    background-color: rgba(0,0,0,0.5);
     border: 1px solid rgba(255,255,255, 0.5);
     margin: .5em;
     text-align: center;
@@ -88,7 +90,11 @@ canvas{
     padding: 1em;
     margin-top: 0;
 }
-#hints ul{
+#hints{
+    border: 1px solid rgba(255,255,255, 0.5);
+    margin: .5em;
+}
+#hints ul, #hint-ship{
     margin: .5em;
     padding: 1em;
     text-align: left;
@@ -96,4 +102,7 @@ canvas{
 }
 #hints ul li{
     margin-top: 8px;
+}
+#hint-ship{
+    text-align: center;
 }
