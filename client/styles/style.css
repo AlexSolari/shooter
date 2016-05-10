@@ -60,11 +60,20 @@ canvas{
     position: fixed;
     bottom: 0;
 }
-#leaderboard{
+#top-panel{
     top: 0;
     right: 0;
     color: #C4F6FF;
     position: fixed;
+    pointer-events: none;
+    -webkit-user-select: none; /* Chrome/Safari */        
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+ */
+    
+    max-width: 250px;
+}
+#leaderboard{
+    color: #C4F6FF;
     background-color: rgba(0,0,0,0.5);
     border: 1px solid rgba(255,255,255, 0.5);
     margin: .5em;
@@ -75,8 +84,16 @@ canvas{
     padding-bottom: 0;
 }
 #leaderboard ul{
-    text-align: right;
     list-style: none;
     padding: 1em;
-    margin-top:0;
+    margin-top: 0;
+}
+#hints ul{
+    margin: .5em;
+    padding: 1em;
+    text-align: left;
+    list-style: none;
+}
+#hints ul li{
+    margin-top: 8px;
 }

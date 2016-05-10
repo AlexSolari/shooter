@@ -102,8 +102,32 @@ window.onload = function() {
   var leaderboard = document.getElementById('leaderboard');
   
   btn.onclick = function () {
-    connection.Start(document.getElementById('name').value);
+    var name = document.getElementById('name').value;
+    var type = document.getElementById('ship-type').value;
+    var hint = "<li> <strong>{key}</strong> - {desc} </li>";
+    var hints = document.getElementById("hints-list");
+    connection.Start(name);
     document.getElementById('popup').style.display = "none";
+    switch (type) {
+      case 'interceptor-ship':
+        hints.innerHTML += hint.replace("{key}", "Q").replace("{desc}", "Place mine that explodes on touch, dealing 10 dmg.");
+        hints.innerHTML += hint.replace("{key}", "W").replace("{desc}", "Overdrive reactor, increasing move and firing speed.");
+        break;
+      case 'common-ship':
+        hints.innerHTML += hint.replace("{key}", "Q").replace("{desc}", "Launch homing missle, that deals 10 dmg. Only 2 rockets can exist at on time.");
+        hints.innerHTML += hint.replace("{key}", "W").replace("{desc}", "Place mine that explodes on touch, dealing 10 dmg.");
+        break;
+      case 'frigate-ship':
+        hints.innerHTML += hint.replace("{key}", "Q").replace("{desc}", "Activate shield, lowering all incoming damage to 1.");
+        hints.innerHTML += hint.replace("{key}", "W").replace("{desc}", "Charge your attacks, increasing projectile speed and lowering activation time.");
+        break;
+      case 'destroyer-ship':
+        hints.innerHTML += hint.replace("{key}", "Q").replace("{desc}", "Repair your ship for 25hp.");
+        hints.innerHTML += hint.replace("{key}", "W").replace("{desc}", "Warp, increasing speed and acceleration.");
+        hints.innerHTML += hint.replace("{key}", "Passive").replace("{desc}", "Repairs your ship slowly.");
+        break;
+    }
+    
   };
   btn2.onclick = function () {
     document.getElementById('popup').style.display = "none";
