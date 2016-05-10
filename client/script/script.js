@@ -114,7 +114,7 @@ window.onload = function() {
       case 'interceptor-ship':
         hints.innerHTML += hint.replace("{key}", "Q").replace("{desc}", "Place mine that explodes on touch, dealing 10 dmg.");
         hints.innerHTML += hint.replace("{key}", "W").replace("{desc}", "Overdrive reactor, increasing move and firing speed.");
-        shipHint.innerHTML = "Fast ship, 60 HP. <br/> Projectile damage: 0.5 <br/>  Projectile speed: 20";
+        shipHint.innerHTML = "Fast ship, 60 HP. <br/> Projectile damage: 0.9 <br/>  Projectile speed: 20";
         break;
       case 'common-ship':
         hints.innerHTML += hint.replace("{key}", "Q").replace("{desc}", "Launch homing missle, that deals 10 dmg. Only 2 rockets can exist at on time.");

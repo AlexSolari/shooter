@@ -59,10 +59,14 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
       .filter(client => client.ship)
       .map(client => ({name: client.ship.name, score: client.ship.points}) )
       .sort((r1, r2) => r2.score - r1.score);
+      
+    var interval = new Date().getTime() - sTime;
+    
+    game.UpdateScaleCooefficient(interval);
     
     game.Broadcast("gamestate", { 
       coords: state,
-      date: new Date().getTime() - sTime,
+      date: interval,
       points: points,
     } );
   });
