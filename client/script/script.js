@@ -82,11 +82,24 @@ function ProcessResponse(entities) {
   frameToDraw = entities;
 }
 
+function ScoreToDom(score) {
+  var html = "<h3>Score</h3><ul>{list}</ul>";
+  var li = "<li><strong>{name}</strong>:{score}</li>";
+  var list = "";
+  
+  score.forEach(function(record) {
+    list += li.replace("{name}", record.name).replace("{score}", record.score);
+  });
+  
+  return html.replace("{list}", list);
+}
+
 window.onload = function() {
   drawer = new Drawer();
   connection = new Connection();
   var btn = document.getElementById('start');
   var btn2 = document.getElementById('spectrate');
+  var leaderboard = document.getElementById('leaderboard');
   
   btn.onclick = function () {
     connection.Start(document.getElementById('name').value);
@@ -133,6 +146,7 @@ window.onload = function() {
     fpsDom.innerHTML = fps + "fps";
     
     ProcessResponse(entities);
+    leaderboard.innerHTML = ScoreToDom(data.points);
   });
   
   var UpdatesPerSecond = 60;

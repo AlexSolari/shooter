@@ -55,8 +55,16 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
     game.Broadcast("getInput_request");
 
     var state = game.GetState();
+    var points = game.clients
+      .filter(client => client.ship)
+      .map(client => ({name: client.ship.name, score: client.ship.points}) )
+      .sort((r1, r2) => r2.score - r1.score);
     
-    game.Broadcast("gamestate", { coords: state, date: new Date().getTime() - sTime } );
+    game.Broadcast("gamestate", { 
+      coords: state,
+      date: new Date().getTime() - sTime,
+      points: points,
+    } );
   });
   
   game.AddBots(15);

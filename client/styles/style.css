@@ -60,3 +60,23 @@ canvas{
     position: fixed;
     bottom: 0;
 }
+#leaderboard{
+    top: 0;
+    right: 0;
+    color: #C4F6FF;
+    position: fixed;
+    background-color: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255, 0.5);
+    margin: .5em;
+    text-align: center;
+}
+#leaderboard h3{
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+#leaderboard ul{
+    text-align: right;
+    list-style: none;
+    padding: 1em;
+    margin-top:0;
+}
