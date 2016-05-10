@@ -8,7 +8,8 @@ function Explosion(x,y)
 }
 
 Explosion.prototype.NextStage = function() {
+    var self = this;
     if (this.stage < 5)
-        setTimeout(() => this.NextStage(), 75);
+        setTimeout(function() { self.NextStage() }, 75);
     this.stage++;
 }

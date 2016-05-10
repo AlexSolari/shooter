@@ -14,6 +14,7 @@ var inputScanAllowed = true;
 var shipId;
 var frameToDraw = null;
 var explosions = [];
+var kills = [];
 
 function Draw() {
   var entities = frameToDraw || [];
@@ -108,7 +109,15 @@ window.onload = function() {
   });
   
   connection.AddResponseHandler("kill", function(data) {
-     document.getElementById("last-kill").innerHTML = "["+new Date().toLocaleTimeString()+"] "+data.killer + " killed " + data.died;
+    var killData = {
+      "time": new Date().toLocaleTimeString(),
+      "killer": data.killer,
+      "died": data.died,
+    };
+    kills.push(killData);  
+    var str = "["+killData.time+"] "+killData.killer + " killed " + killData.died;
+    console.log(str);
+    document.getElementById("last-kill").innerHTML = str;
   });
   
   connection.AddResponseHandler('gamestate', function(data) {
@@ -120,7 +129,7 @@ window.onload = function() {
     var entities = data.coords;
     var date = data.date;
     
-    pingDom.innerHTML = date + "ms";
+    pingDom.innerHTML = "UpdateTime: " + date + "ms";
     fpsDom.innerHTML = fps + "fps";
     
     ProcessResponse(entities);

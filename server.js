@@ -12,7 +12,7 @@ var server = http.createServer(router);
 var io = socketio.listen(server);
 
 /* --- Initializing server (disabling logging and setuping client-resourses resolving) --- */
-io.set('log level', 1);
+process.env.DEBUG = false;
 router.use(express.static(path.resolve(__dirname, 'client')));
 var UpdatesPerSecond = 60;
 
