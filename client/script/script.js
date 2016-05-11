@@ -7,10 +7,8 @@ var connection;
 var input = { clicked: false, x: 0, y: 0, firstAbility: false, secondAbility: false };
 var fpsDom = null;
 var pingDom = null;
-var getInputRequest = "getInput_request";
 var getInputResponse = "getInput_response";
 var frameTime = 0, lastLoop = new Date, thisLoop;
-var inputScanAllowed = true;
 var shipId;
 var frameToDraw = null;
 var explosions = [];
@@ -147,10 +145,9 @@ window.onload = function() {
       shipId = id;
   });
   
-  connection.AddResponseHandler(getInputRequest, function () {
+  setInterval(function() {
     connection.Send(getInputResponse, input);
-    inputScanAllowed = true;
-  });
+  }, 1000 / 60);
   
   connection.AddResponseHandler("kill", function(data) {
     var killData = {
@@ -186,11 +183,8 @@ window.onload = function() {
 };
 
 window.onmousemove = function (event) {
-  if (inputScanAllowed){
-    input.x = event.clientX/drawer.delta;
-    input.y = event.clientY/drawer.delta;
-    inputScanAllowed = false;
-  }
+  input.x = event.clientX/drawer.delta;
+  input.y = event.clientY/drawer.delta;
 };
 
 window.onmousedown = function () { 

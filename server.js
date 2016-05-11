@@ -52,17 +52,12 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
       client.Update();
     });
     
-    game.Broadcast("getInput_request");
-
     var state = game.GetState();
-    var points = game.clients
-      .filter(client => client.ship)
-      .map(client => ({name: client.ship.name, score: client.ship.points}) )
-      .sort((r1, r2) => r2.score - r1.score);
+    var points = game.score;
       
     var interval = new Date().getTime() - sTime;
     
-    game.UpdateScaleCooefficient(interval);
+    game.UpdateScaleCooefficient(Math.max(1, interval / (1000 / UpdatesPerSecond)));
     
     game.Broadcast("gamestate", { 
       coords: state,
@@ -71,6 +66,6 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
     } );
   });
   
-  game.AddBots(5);
+  game.AddBots(10);
 });
 
