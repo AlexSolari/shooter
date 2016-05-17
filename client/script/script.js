@@ -37,6 +37,10 @@ function Draw() {
         }
   });
   projectiles.forEach(function (entity) {
+      if (entity.timedLife && entity.lifeSpan < 50 && (entity.lifeSpan % 5 == 0 || entity.lifeSpan % 3 == 0 || entity.lifeSpan % 7 == 0))
+      {
+        return;
+      }
       if (entity.type.indexOf("-rocket") > 0)
         {
           if (entity.type.indexOf("small") >= 0 && !entity.autotargetEnabled)
