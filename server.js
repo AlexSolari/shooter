@@ -43,29 +43,26 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
         name = "Anon";
       client.ship.name = name;
     });
+    
+    client.AddRequestHandler('tickrate_request', function() {
+       client.Send("tickrate_response", UpdatesPerSecond);
+    });
   });
   
   game.StartMainLoop(UpdatesPerSecond, function () {
-    var sTime = new Date().getTime();
-    
     game.clients.forEach(function (client) {
       client.Update();
     });
     
     var state = game.GetState();
     var points = game.score;
-      
-    var interval = new Date().getTime() - sTime;
-    
-    game.UpdateScaleCooefficient(Math.max(1, interval / (1000 / UpdatesPerSecond)));
     
     game.Broadcast("gamestate", { 
       coords: state,
-      date: interval,
       points: points,
     } );
   });
   
-  game.AddBots(10);
+  game.AddBots(100);
 });
 

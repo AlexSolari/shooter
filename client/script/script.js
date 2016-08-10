@@ -6,21 +6,34 @@ var drawer;
 var connection;
 var input = { clicked: false, x: 0, y: 0, firstAbility: false, secondAbility: false };
 var fpsDom = null;
-var pingDom = null;
 var getInputResponse = "getInput_response";
 var frameTime = 0, lastLoop = new Date, thisLoop;
 var shipId;
-var frameToDraw = null;
+var gamestate = null;
 var explosions = [];
 var kills = [];
+var UpdatesPerSecond = null;
+var DrawingsPreSecond = 100;
 
 function Draw() {
-  var entities = frameToDraw || [];
+  var thisFrameTime = (thisLoop=new Date) - lastLoop;
+  frameTime+= (thisFrameTime - frameTime)/5;
+  lastLoop = thisLoop;
+  var fps = (1000/frameTime).toFixed(0);
+    
+  fpsDom.innerHTML = fps + "fps";
+  
+  var entities = gamestate || [];
   entities = entities.filter(function (entity) { return (entity.x != 0 && entity.y != 0) });
+  entities.forEach(function(entity) {
+     entity.x +=  entity.speed.x * UpdatesPerSecond/DrawingsPreSecond;
+     entity.y +=  entity.speed.y * UpdatesPerSecond/DrawingsPreSecond;
+  });
   
   drawer.Clear();
   var ships = entities.filter(function (entity) { return entity.type.indexOf("-ship") > 0});
   var projectiles = entities.filter(function (entity) { return entity.type.indexOf("-ship") < 0});
+  
   ships.forEach(function(entity) {
 
       if (entity.state == "dead" && entity.respawnTimer > 98)
@@ -82,7 +95,7 @@ function Draw() {
 }
 
 function ProcessResponse(entities) {
-  frameToDraw = entities;
+  gamestate = entities;
 }
 
 function ScoreToDom(score) {
@@ -143,16 +156,11 @@ window.onload = function() {
   };
   
   fpsDom = document.getElementById('fps');
-  pingDom = document.getElementById("ping");
   
   connection.AddResponseHandler("ship-id", function(id) {
       shipId = id;
   });
-  
-  setInterval(function() {
-    connection.Send(getInputResponse, input);
-  }, 1000 / 60);
-  
+
   connection.AddResponseHandler("kill", function(data) {
     var killData = {
       "time": new Date().toLocaleTimeString(),
@@ -166,24 +174,23 @@ window.onload = function() {
   });
   
   connection.AddResponseHandler('gamestate', function(data) {
-    var thisFrameTime = (thisLoop=new Date) - lastLoop;
-    frameTime+= (thisFrameTime - frameTime)/5;
-    lastLoop = thisLoop;
-    var fps = (1000/frameTime).toFixed(0);
-    
     var entities = data.coords;
-    var date = data.date;
-    
-    pingDom.innerHTML = "UpdateTime: " + date + "ms";
-    fpsDom.innerHTML = fps + "fps";
     
     ProcessResponse(entities);
     leaderboard.innerHTML = ScoreToDom(data.points);
   });
   
-  var UpdatesPerSecond = 60;
+  connection.AddResponseHandler('tickrate_response', function(data) {
+      UpdatesPerSecond = data;
+    
+      setInterval(function() {
+        connection.Send(getInputResponse, input);
+      }, 1000 / UpdatesPerSecond);
+      
+      setInterval(Draw, 1000 / DrawingsPreSecond);
+  });
   
-  setInterval(Draw, 1000 / UpdatesPerSecond);
+  connection.Send('tickrate_request');
 };
 
 window.onmousemove = function (event) {
