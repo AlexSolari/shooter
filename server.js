@@ -14,7 +14,7 @@ var io = socketio.listen(server);
 /* --- Initializing server (disabling logging and setuping client-resourses resolving) --- */
 process.env.DEBUG = false;
 router.use(express.static(path.resolve(__dirname, 'client')));
-var UpdatesPerSecond = 60;
+var UpdatesPerSecond = 30;
 
 /* --- Starting server --- */
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
@@ -23,6 +23,8 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
       
     var client = game.AddClient(socket);
     console.log("connected: " +client.id);
+    client.Send("frameshift", game.FrameNumber);
+    client.Send("tickrate", UpdatesPerSecond);
     
     client.AddRequestHandler('disconnect', function () {
       console.log("disconnected: " +client.id);
@@ -57,6 +59,7 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
     game.Broadcast("gamestate", { 
       coords: state,
       points: points,
+      frame: game.FrameNumber
     } );
   });
   

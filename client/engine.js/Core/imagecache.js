@@ -37,7 +37,7 @@ ImageCache.prototype.Get = function (url, callback) {
 };
 
 ImageCache.prototype.Assets = [
-                                "Files/Sprites/missingTexture.png"
+                                "sprites/missingTexture.png"
                               ];
                                 
 ImageCache.prototype.Initialize = function () {

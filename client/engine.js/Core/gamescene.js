@@ -8,6 +8,8 @@ function GameScene(width, height)
     this.Screen.width = width;
     this.Screen.height = height;
     this.shipId = -1;
+    this.ExpectedFrameNumber = 0;
+    this.FrameNumber = 0;
 }
 
 GameScene.prototype.Add = function Add(entity) {
@@ -23,19 +25,41 @@ GameScene.prototype.Update = function Update() {
 }
 
 GameScene.prototype.Render = function Render(fps, tickrate) {
+    this.FrameNumber++;
+    
+    if (this.ExpectedFrameNumber > this.FrameNumber * (fps/tickrate)){
+        console.warn("Skipped frame!");
+        return;
+    }
+        
+    
     var self = this;
     
     this.Screen.clearRect(0, 0, this.Screen.width, this.Screen.height);
     this.Entities.forEach(function EntityRender(entity) {
+        if (entity.speed)
+        {
+            entity.x += entity.speed.x * (tickrate/fps);
+            entity.y += entity.speed.y * (tickrate/fps);
+        }
+        
         if (entity.state && entity.state != "alive")
             return;
             
         if (entity.timedLife && entity.lifeSpan < 50 && (entity.lifeSpan % 5 == 0 || entity.lifeSpan % 3 == 0 || entity.lifeSpan % 7 == 0))
             return;
        
-        self.Draw(
-            (entity.id != self.shipId) ? entity.type : entity.type+"-self"
-            , entity.angle + 90, entity.x, entity.y);
+        var spriteName = entity.type;
+        if (entity.id == self.shipId)
+        {
+            spriteName = entity.type + "-self";
+        }
+        if (entity.type.indexOf("small-rocket") > -1 && entity.autotargetEnabled == false)
+        {
+            spriteName = "disabled-small-rocket-projectile";
+        }
+       
+        self.Draw(spriteName, entity.angle + 90, entity.x, entity.y);
         
         if (entity.hp)
             self.Text(entity.hp.toFixed(2) + "/" + entity.maxhp, entity.x-30, entity.y - 20, 10, "Arial", "white");
@@ -45,7 +69,7 @@ GameScene.prototype.Render = function Render(fps, tickrate) {
         if (entity.type == "singularity-projectile")
         {
             var radius = 150;
-            var enemies = self.Entities.filter(function (s) {
+            var enemies = self.Entities.filter(function ShipExtractor(s) {
                 return s.type.indexOf("-ship") > 0 && s.state != "dead" && s.id != entity.emitter;
             });
             var targets = enemies;
@@ -55,6 +79,7 @@ GameScene.prototype.Render = function Render(fps, tickrate) {
                     self.Curve([entity, targets[i]], "#99D9EA");
             }
         }
+        
     });
 }
 
@@ -69,7 +94,7 @@ GameScene.prototype.Text = function Text(text, x, y, size, font, color) {
 GameScene.prototype.Draw = function Draw(sprite, angle, x, y) {
     var self = this; 
     
-    Game.ImageCache.Get("sprites/"+sprite+".png", function (image) {
+    Game.ImageCache.Get("sprites/"+sprite+".png", function DrawCallback(image) {
         self.Screen.save(); 
 	    self.Screen.translate(x, y);
 	    self.Screen.rotate(angle * Math.PI/180);

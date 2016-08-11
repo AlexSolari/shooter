@@ -8,15 +8,30 @@ var kills = [];
 $(function Launch() {
     Game = new GameManager();
     Game.Initialize();
-    Game.Start(1000, 1000, function(game, scene) {
+    Game.Start(200, 10, function Initializer(game, scene) {
       var connection = new Connection();
       var input = { clicked: false, x: 0, y: 0, firstAbility: false, secondAbility: false };
       var leaderboard = document.getElementById('leaderboard');
+      var ScoreToDom = function ScoreToDom(score) {
+        var html = "<h3>Score</h3><ul>{list}</ul>";
+        var li = "<li><strong>{name}</strong>:{score}</li>";
+        var list = "";
+        
+        score.forEach(function(record) {
+          list += li.replace("{name}", record.name).replace("{score}", record.score);
+        });
+        
+        return html.replace("{list}", list);
+      };
       
       connection.AddResponseHandler("ship-id", function(id) {
           scene.shipId = id;
       });
-    
+      
+      connection.AddResponseHandler("frameshift", function(shift) {
+          scene.FrameNumber = shift;
+      });
+      
       connection.AddResponseHandler("kill", function(data) {
         var killData = {
           "time": new Date().toLocaleTimeString(),
@@ -25,7 +40,6 @@ $(function Launch() {
         };
         kills.push(killData);  
         var str = "["+killData.time+"] "+killData.killer + " killed " + killData.died;
-        console.log(str);
         document.getElementById("last-kill").innerHTML = str;
       });
       
@@ -33,6 +47,7 @@ $(function Launch() {
         var entities = data.coords;
         
         scene.Entities = entities;
+        scene.ExpectedFrameNumber = data.frame;
         leaderboard.innerHTML = ScoreToDom(data.points);
         
         connection.Send("getInput_response", input);
@@ -81,20 +96,7 @@ $(function Launch() {
     });
 });
 
-
-function ScoreToDom(score) {
-  var html = "<h3>Score</h3><ul>{list}</ul>";
-  var li = "<li><strong>{name}</strong>:{score}</li>";
-  var list = "";
-  
-  score.forEach(function(record) {
-    list += li.replace("{name}", record.name).replace("{score}", record.score);
-  });
-  
-  return html.replace("{list}", list);
-}
-
-window.onload = function() {
+$(function Preparation() {
   var btnStart = document.getElementById('start');
   var btnSpectrate = document.getElementById('spectrate');
   
@@ -133,5 +135,5 @@ window.onload = function() {
     document.getElementById('popup').style.display = "none";
     document.getElementById('hints').style.display = "none";
   };
-};
+});
 
