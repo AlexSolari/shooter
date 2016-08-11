@@ -44,9 +44,6 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
       client.ship.name = name;
     });
     
-    client.AddRequestHandler('tickrate_request', function() {
-       client.Send("tickrate_response", UpdatesPerSecond);
-    });
   });
   
   game.StartMainLoop(UpdatesPerSecond, function () {
@@ -63,6 +60,6 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
     } );
   });
   
-  game.AddBots(100);
+  game.AddBots(15);
 });
 

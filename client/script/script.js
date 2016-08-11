@@ -1,102 +1,86 @@
 /*global Connection*/
-/*global Drawer*/
-/*global Explosion*/
+/*global GameManager*/
+/*global $*/
 
-var drawer;
-var connection;
-var input = { clicked: false, x: 0, y: 0, firstAbility: false, secondAbility: false };
-var fpsDom = null;
-var getInputResponse = "getInput_response";
-var frameTime = 0, lastLoop = new Date, thisLoop;
-var shipId;
-var gamestate = null;
-var explosions = [];
+var Game;
 var kills = [];
-var UpdatesPerSecond = null;
-var DrawingsPreSecond = 100;
 
-function Draw() {
-  var thisFrameTime = (thisLoop=new Date) - lastLoop;
-  frameTime+= (thisFrameTime - frameTime)/5;
-  lastLoop = thisLoop;
-  var fps = (1000/frameTime).toFixed(0);
+$(function Launch() {
+    Game = new GameManager();
+    Game.Initialize();
+    Game.Start(1000, 1000, function(game, scene) {
+      var connection = new Connection();
+      var input = { clicked: false, x: 0, y: 0, firstAbility: false, secondAbility: false };
+      var leaderboard = document.getElementById('leaderboard');
+      
+      connection.AddResponseHandler("ship-id", function(id) {
+          scene.shipId = id;
+      });
     
-  fpsDom.innerHTML = fps + "fps";
-  
-  var entities = gamestate || [];
-  entities = entities.filter(function (entity) { return (entity.x != 0 && entity.y != 0) });
-  entities.forEach(function(entity) {
-     entity.x +=  entity.speed.x * UpdatesPerSecond/DrawingsPreSecond;
-     entity.y +=  entity.speed.y * UpdatesPerSecond/DrawingsPreSecond;
-  });
-  
-  drawer.Clear();
-  var ships = entities.filter(function (entity) { return entity.type.indexOf("-ship") > 0});
-  var projectiles = entities.filter(function (entity) { return entity.type.indexOf("-ship") < 0});
-  
-  ships.forEach(function(entity) {
+      connection.AddResponseHandler("kill", function(data) {
+        var killData = {
+          "time": new Date().toLocaleTimeString(),
+          "killer": data.killer,
+          "died": data.died,
+        };
+        kills.push(killData);  
+        var str = "["+killData.time+"] "+killData.killer + " killed " + killData.died;
+        console.log(str);
+        document.getElementById("last-kill").innerHTML = str;
+      });
+      
+      connection.AddResponseHandler('gamestate', function(data) {
+        var entities = data.coords;
+        
+        scene.Entities = entities;
+        leaderboard.innerHTML = ScoreToDom(data.points);
+        
+        connection.Send("getInput_response", input);
+      });
+      
+      window.onmousemove = function (event) {
+        input.x = event.clientX;
+        input.y = event.clientY;
+      };
+      
+      window.onmousedown = function () { 
+        input.clicked = true; 
+      };
+      
+      window.onkeydown = function (event) {
+        if (String.fromCharCode(event.keyCode).toLowerCase() == "q")
+        {
+          input.firstAbility = true;  
+        }
+        if (String.fromCharCode(event.keyCode).toLowerCase() == "w")
+        {
+          input.secondAbility = true;  
+        }
+      };
+      
+      window.onkeyup = function (event) {
+        if (String.fromCharCode(event.keyCode).toLowerCase() == "q")
+        {
+          input.firstAbility = false;  
+        }
+        if (String.fromCharCode(event.keyCode).toLowerCase() == "w")
+        {
+          input.secondAbility = false;  
+        }
+      };
+      
+      window.onmouseup = function () {
+        input.clicked = false; 
+      };
+      
+      document.getElementById('start').addEventListener('click', function () {
+        var name = document.getElementById('name').value;
+        connection.Start(name);
+      });
+    
+    });
+});
 
-      if (entity.state == "dead" && entity.respawnTimer > 98)
-        {
-          explosions.push(new Explosion(entity.x, entity.y));
-        }
-        if ((entity.id != shipId && entity.state != "dead") ||
-          (entity.id == shipId && entity.state == "alive")) 
-        {
-          var path = "sprites/ships/" + entity.type + ((entity.id == shipId) ? "/sprite-self.png" : "/sprite.png");
-          drawer.Image(path, entity.x, entity.y, entity.angle+90);
-          drawer.Text(entity.hp.toFixed(2) + "/" + entity.maxhp, entity.x-30, entity.y - 20, 10, undefined, "white");
-          drawer.Text(entity.name, entity.x-30, entity.y - 35, 10, 20, "white");
-        }
-  });
-  projectiles.forEach(function (entity) {
-      if (entity.timedLife && entity.lifeSpan < 50 && (entity.lifeSpan % 5 == 0 || entity.lifeSpan % 3 == 0 || entity.lifeSpan % 7 == 0))
-      {
-        return;
-      }
-      if (entity.type.indexOf("-rocket") > 0)
-        {
-          if (entity.type.indexOf("small") >= 0 && !entity.autotargetEnabled)
-          {
-            drawer.Image("sprites/rockets/disabled-small-rocket-projectile.png", entity.x, entity.y);
-          }
-          else 
-            drawer.Image("sprites/rockets/"+entity.type+".png", entity.x, entity.y, entity.angle+90);
-        }
-        else if (entity.type.indexOf("-mine") > 0)
-        {
-          drawer.Image("sprites/mines/"+entity.type+".png", entity.x, entity.y, entity.angle+new Date().getSeconds()*15);
-        }
-        else 
-        {
-          drawer.Image("sprites/projectiles/"+entity.type+".png", entity.x, entity.y);
-          if (entity.type == "singularity-projectile")
-          {
-            var radius = 150;
-            var enemies = ships.filter(s => s.state != "dead" && s.id != entity.emitter);
-            var targets = enemies;
-            
-            for (var i = 0; i < targets.length; i++) {
-                if (Math.sqrt(Math.pow(entity.x - targets[i].x, 2) + Math.pow(entity.y- targets[i].y, 2)) < radius)
-                    drawer.Curve([entity, targets[i]], "#99D9EA");
-                
-            }
-          }
-        }
-  });
-  explosions.forEach(function (explosion) {
-    if (explosion.stage == 6)
-    {
-      explosions.splice(explosions.indexOf(explosion),1);
-      return;
-    }
-    drawer.Image("sprites/explosion/"+explosion.stage+".png", explosion.x, explosion.y);
-  });
-}
-
-function ProcessResponse(entities) {
-  gamestate = entities;
-}
 
 function ScoreToDom(score) {
   var html = "<h3>Score</h3><ul>{list}</ul>";
@@ -111,19 +95,14 @@ function ScoreToDom(score) {
 }
 
 window.onload = function() {
-  drawer = new Drawer();
-  connection = new Connection();
-  var btn = document.getElementById('start');
-  var btn2 = document.getElementById('spectrate');
-  var leaderboard = document.getElementById('leaderboard');
+  var btnStart = document.getElementById('start');
+  var btnSpectrate = document.getElementById('spectrate');
   
-  btn.onclick = function () {
-    var name = document.getElementById('name').value;
+  btnStart.onclick = function () {
     var type = document.getElementById('ship-type').value;
     var hint = "<li> <strong>{key}</strong> - {desc} </li>";
     var shipHint = document.getElementById("hint-ship");
     var hints = document.getElementById("hints-list");
-    connection.Start(name);
     document.getElementById('popup').style.display = "none";
     switch (type) {
       case 'interceptor-ship':
@@ -150,81 +129,9 @@ window.onload = function() {
     }
     
   };
-  btn2.onclick = function () {
+  btnSpectrate.onclick = function () {
     document.getElementById('popup').style.display = "none";
     document.getElementById('hints').style.display = "none";
   };
-  
-  fpsDom = document.getElementById('fps');
-  
-  connection.AddResponseHandler("ship-id", function(id) {
-      shipId = id;
-  });
-
-  connection.AddResponseHandler("kill", function(data) {
-    var killData = {
-      "time": new Date().toLocaleTimeString(),
-      "killer": data.killer,
-      "died": data.died,
-    };
-    kills.push(killData);  
-    var str = "["+killData.time+"] "+killData.killer + " killed " + killData.died;
-    console.log(str);
-    document.getElementById("last-kill").innerHTML = str;
-  });
-  
-  connection.AddResponseHandler('gamestate', function(data) {
-    var entities = data.coords;
-    
-    ProcessResponse(entities);
-    leaderboard.innerHTML = ScoreToDom(data.points);
-  });
-  
-  connection.AddResponseHandler('tickrate_response', function(data) {
-      UpdatesPerSecond = data;
-    
-      setInterval(function() {
-        connection.Send(getInputResponse, input);
-      }, 1000 / UpdatesPerSecond);
-      
-      setInterval(Draw, 1000 / DrawingsPreSecond);
-  });
-  
-  connection.Send('tickrate_request');
 };
 
-window.onmousemove = function (event) {
-  input.x = event.clientX/drawer.delta;
-  input.y = event.clientY/drawer.delta;
-};
-
-window.onmousedown = function () { 
-  input.clicked = true; 
-};
-
-window.onkeydown = function (event) {
-  if (String.fromCharCode(event.keyCode).toLowerCase() == "q")
-  {
-    input.firstAbility = true;  
-  }
-  if (String.fromCharCode(event.keyCode).toLowerCase() == "w")
-  {
-    input.secondAbility = true;  
-  }
-};
-
-window.onkeyup = function (event) {
-  if (String.fromCharCode(event.keyCode).toLowerCase() == "q")
-  {
-    input.firstAbility = false;  
-  }
-  if (String.fromCharCode(event.keyCode).toLowerCase() == "w")
-  {
-    input.secondAbility = false;  
-  }
-};
-
-window.onmouseup = function () {
-  input.clicked = false; 
-  
-};
