@@ -1,6 +1,11 @@
+/*global ImageCache*/
+/*global $*/
+/*global GameScene*/
+
 function GameManager() {
     this.UpdateIntervalID = 0;
     this.RenderIntervalID = 0;
+    this.FpsIntervalID = 0;
 
     this.ScreenWidth = window.innerWidth
                 || document.documentElement.clientWidth
@@ -12,9 +17,8 @@ function GameManager() {
     
     this.Scenes = [];
 
-    this.CurrentSecondNumber = 0;
-    this.CurrentFrameNumber = 0;
-    this.LastSecondFrameNumber = 0;
+    this.FramesRendered = 0;
+    
     this.ImageCache = new ImageCache();
 
     this.Cursor = {};
@@ -55,16 +59,13 @@ GameManager.prototype.Start = function Start(targetFPS, targetTickrate, initiali
         self.GetTopScene().Update();
     }, 1000 / targetTickrate);
     this.RenderIntervalID = setInterval(function GameLoop() {
-        self.CountFPS();
         self.GetTopScene().Render(targetFPS, targetTickrate);
+        
+        this.FramesRendered++;
     }, 1000 / targetFPS);
-}
-
-GameManager.prototype.CountFPS = function CountFPS() {
-    if (this.CurrentSecondNumber != new Date().getSeconds()) {
-        $("#fpsMeter").html(this.CurrentFrameNumber - this.LastSecondFrameNumber + "fps");
-        this.LastSecondFrameNumber = this.CurrentFrameNumber;
-        this.CurrentSecondNumber = new Date().getSeconds();
-    }
-    this.CurrentFrameNumber++;
-}
+    this.FpsIntervalID = setInterval(function GameLoop() {
+        $("#fpsMeter").html(this.FramesRendered + "fps");
+        
+        this.FramesRendered = 0;
+    }, 1000);
+};
